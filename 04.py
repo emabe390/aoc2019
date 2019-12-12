@@ -38,7 +38,6 @@ def harder(digit):
      tmp+=prev
    else:
      if len(tmp) == 2:
-        print tmp, digit
         return True
      tmp = x
    prev = x
