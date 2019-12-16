@@ -1,3 +1,4 @@
+import sys
 from helper import read_data
 from copy import copy
 
@@ -19,6 +20,9 @@ class IntCode(object):
            self.pointer = self.pointer + n
 
    def set(self, pointer, data):
+       if isinstance(pointer, list):
+           pointer = pointer[0]
+       print "setting pointer %s with data %s" % (pointer, data)
        self.program[pointer] = data
 
    def run(self, program):
@@ -29,55 +33,72 @@ class IntCode(object):
           if x is not None:
               return x
 
-   def exe(self):
+   def get_operation(self):
        op = self.pop()
+       opcode = op % 100
+       modes = []
+       op = int(op / 10)
+       while op > 0:
+          op = int(op / 10)
+          modes.append(op % 10)
+       return modes, opcode
+
+   def exe(self):
+       modes, op = self.get_operation()
        if op == 1:
-           self.add()
+           self.add(modes)
        elif op == 2:
-           self.mul()
+           self.mul(modes)
        elif op == 3:
-           self.input()
+           self.input(modes)
+       elif op == 4:
+           self.output(modes)
        elif op == 99:
            return self.exit()
        else:
            print "Unknown operation", op
+           sys.exit(1)
 
-   def add(self):
-       p1, p2, pres = self.pop(3)
-       self.set(pres, self.program[p1] + self.program[p2])
+   def get_data(self, n, modes):
+       while len(modes) < n:
+          modes.append(0)
+       values = []
+       for m in modes:
+          d = self.pop()
+          if m == 0:
+              values.append(self.program[d])
+          elif m == 1:
+              values.append(d)
+          else:
+              print "Unknown mode"
+              sys.exit(1)
+       print values
+       return values
 
-   def mul(self):
-       p1, p2, pres = self.pop(3)
-       self.set(pres, self.program[p1] * self.program[p2])
+   def add(self, modes):
+       p1, p2, pres = self.get_data(3, modes)
+       self.set(pres, p1 + p2)
 
-   def input(self):
-       pres = self.pop()
+   def mul(self, modes):
+       p1, p2, pres = self.get_data(3, modes)
+       self.set(pres, p1 * p2)
+
+   def input(self, modes):
+       pres = self.get_data(1, modes)
        self.set(pres, int(raw_input("Input: ")))
 
-   def output(self):
-       p1 = self.pop()
-       print self.program[p1]
+   def output(self, modes):
+       pres = self.get_data(1, modes)
+       print self.program[pres]
 
    def exit(self):
        return self.program[0]
 
 def main():
-   oprog = read_data("02.txt", converter=convert_program)[0]
+   oprog = read_data("05.txt", converter=convert_program)[0]
    prog = copy(oprog)
-   prog[1] = 12
-   prog[2] = 2
    ic = IntCode()
    print ic.run(prog)
-   for n in xrange(100):
-     for v in xrange(100):
-        prog = copy(oprog)
-        prog[1] = n
-        prog[2] = v
-        res = ic.run(prog)
-        if res == 19690720:
-           print n * 100 + v
-           return
-   print "fail"
 
 
 if __name__ == '__main__':
