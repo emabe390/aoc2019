@@ -49,26 +49,6 @@ def main():
            return
    print "fail"
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 if __name__ == '__main__':
    main()
 
