@@ -8,3 +8,10 @@ def read_data(file, converter=None):
       data = converted
    return data
 
+def gen_converter(*args):
+   def foo(data):
+      res = []
+      for data_type, data in zip(args, data.split(" ")):
+         res.append(data_type(data))
+      return res
+   return foo
