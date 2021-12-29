@@ -12,6 +12,8 @@ def gen_converter(*args):
    def foo(data):
       res = []
       for data_type, data in zip(args, data.split(" ")):
+         if data_type is None:
+            continue
          res.append(data_type(data))
       return res
    return foo
