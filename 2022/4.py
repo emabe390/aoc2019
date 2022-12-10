@@ -1,4 +1,4 @@
-from helper import read_data, gen_splitter
+from helper import read_data
 
 def split_ass(x):
  a, b = x.split(",")
